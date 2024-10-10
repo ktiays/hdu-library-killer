@@ -155,7 +155,7 @@ class Killer:
         apiToken = f"post&/Seat/Index/bookSeats?LAB_JSON=1&api_time{data['api_time']}&beginTime{data['beginTime']}&duration{data['duration']}&is_recommend0&seatBookers[0]{data['seatBookers[0]']}&seats[0]{data['seats[0]']}"
         md5 = hashlib.md5(apiToken.encode("utf-8")).hexdigest()
         apiToken = base64.b64encode(md5.encode("utf-8"))
-        return data, apiToken
+        return data, apiToken, begin_time
 
     def showPlan(self):
         print(f"当前共有{len(self.plans)}个预约方案")
@@ -183,13 +183,13 @@ class Killer:
         index = set(index)
         self.plans = [x for i, x in enumerate(self.plans) if i not in index]
 
-    def run(self, plan, begin_time_mapping: Callable = None):
-        data, Api_Token = self.plan2data(plan, begin_time_mapping)
+    def run(self, plan, begin_time_mapping: Callable = None) -> tuple[any, dt.datetime]:
+        data, Api_Token, begin_time = self.plan2data(plan, begin_time_mapping)
         url = self.urls["book_seat"]
         self.session.headers["Api-Token"] = Api_Token.decode()
         self.session.headers["Content-Length"] = "114"
         res = self.session.post(url=url, data=data).json()
-        return res
+        return res, begin_time
 
     def changeTime(self, index, beginTime, duration):
         for i in index:

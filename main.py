@@ -27,6 +27,7 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 class UserInterface:
     def __init__(self, args=None):
+        self.args = args
         self.configFile = "./config/config.yaml" if args is None else args.config
         self.killer = Killer()
         self.funcs = [
@@ -208,7 +209,9 @@ class UserInterface:
         for retryCnt in range(self.killer.cfg["settings"]["max_try_times"]):
             print(f"第{retryCnt+1}次尝试")
             for i, plan in enumerate(self.killer.plans):
-                res = self.killer.run(plan, begin_time_mapping=begin_time_mapper)
+                res, begin_time = self.killer.run(
+                    plan, begin_time_mapping=begin_time_mapper
+                )
                 if res["CODE"] == "ok":
                     print("座位预约成功，座位信息为：")
                     table = PrettyTable(
@@ -220,7 +223,7 @@ class UserInterface:
                             seat["roomName"],
                             seat["floorName"],
                             ",".join([x["seatNum"] for x in plan["seatsInfo"]]),
-                            plan["beginTime"],
+                            begin_time,
                             str(plan["duration"]) + "小时",
                             ",".join([x["bookerName"] for x in plan["seatsInfo"]]),
                         ]
@@ -281,6 +284,10 @@ class UserInterface:
         ui.init()
         ui.login()
         while True:
+            if self.args.start_polling:
+                self.start_polling()
+                return
+
             self.showMenu()
             try:
                 choice = int(input("请输入选项："))
@@ -437,6 +444,7 @@ if __name__ == "__main__":
         default="config/config.yaml",
         help="config file path",
     )
+    parse.add_argument("--start_polling", action="store_true")
     args = parse.parse_args()
     ui = UserInterface(args=args)
     ui.run()
