@@ -178,27 +178,27 @@ class UserInterface:
     ):
         if start_time < datetime.now():
             raise Exception("开始时间不能小于当前时间")
-        print("在倒计时过程中，您可以使用Ctrl+C终止程序")
+        print("在倒计时过程中，您可以使用Ctrl+C终止程序\n")
+        print(f"预约开始时间为{start_time}")
         while True:
             if datetime.now() >= start_time:
                 break
-            now = datetime.now().replace(microsecond=0)
             left = int((start_time - datetime.now()).total_seconds())
             if left < 60:
                 print(
-                    f"\r当前时间为{now}，预约开始时间为{start_time}，还有{left}秒，请耐心等待",
+                    f"\r还有{left}秒，请耐心等待",
                     end="",
                     flush=True,
                 )
             elif left < 3600:
                 print(
-                    f"\r当前时间为{now}，预约开始时间为{start_time}，还有{left//60}分{left%60}秒，请耐心等待",
+                    f"\r还有{left//60}分{left%60}秒，请耐心等待",
                     end="",
                     flush=True,
                 )
             else:
                 print(
-                    f"\r当前时间为{now}，预约开始时间为{start_time}，还有{left//3600}时{left%3600//60}分{left%60}秒，请耐心等待",
+                    f"\r还有{left//3600}时{left%3600//60}分{left%60}秒，请耐心等待",
                     end="",
                     flush=True,
                 )
